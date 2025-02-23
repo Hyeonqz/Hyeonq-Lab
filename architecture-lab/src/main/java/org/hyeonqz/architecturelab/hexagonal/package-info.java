@@ -1,0 +1,1 @@
+package org.hyeonqz.architecturelab.hexagonal;
