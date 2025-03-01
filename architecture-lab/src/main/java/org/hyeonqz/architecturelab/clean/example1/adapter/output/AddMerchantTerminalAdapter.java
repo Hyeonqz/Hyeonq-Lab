@@ -12,23 +12,22 @@ import lombok.RequiredArgsConstructor;
 @Repository
 public class AddMerchantTerminalAdapter implements AddMerchantTerminalPort {
 
-/*  ⭐️ 위 Adapter 는 영속성 관련 된 부분을 처리한다 -> 아래 구조 처럼 사용하면 된다.
-    private final MerchantTerminalRepository merchantTerminalRepository;
+//  ⭐️ 위 Adapter 는 영속성 관련 된 부분을 처리한다 -> 아래 구조 처럼 사용하면 된다.
+    //private final MerchantTerminalRepository merchantTerminalRepository;
 
     @Override
     public MerchantTerminalDomain save(MerchantTerminalDomain merchantTerminalDomain) {
 
         // domain -> to entity
-        MerchantTerminal merchantTerminal = MerchantTerminal.builder().build();
+        //MerchantTerminal merchantTerminal = MerchantTerminal.builder().build();
 
         // save
-        merchantTerminalRepository.save(merchantTerminal);
+        //merchantTerminalRepository.save(merchantTerminal);
 
         // entity -> domain
-        MerchantTerminalDomain merchantTerminalDomain = MerchantTerminalMapper.toDomain();
+        //MerchantTerminalDomain merchantTerminalDomain = MerchantTerminalMapper.toDomain();
 
         return merchantTerminalDomain;
     }
-*/
 
 }
