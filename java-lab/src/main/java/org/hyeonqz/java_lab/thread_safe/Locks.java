@@ -1,4 +1,4 @@
-package org.hyeonqz.java_lab;
+package org.hyeonqz.java_lab.thread_safe;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
