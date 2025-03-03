@@ -13,6 +13,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class PosQueryService {
 	private final PosRepository posRepository;
-	private final RedisTemplate<String, Object> redisTemplate;
+	//private final RedisTemplate<String, Object> redisTemplate;
 
 }

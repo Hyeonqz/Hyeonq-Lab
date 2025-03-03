@@ -18,7 +18,7 @@ public class PosCommandService {
 	private final PosRepository posRepository;
 
 	/* 복잡한 데이터 구조나 성능 최적화가 필요할 때 사용 */
-	private final RedisTemplate<String,Object> redisTemplate;
+	//private final RedisTemplate<String,Object> redisTemplate;
 
 	@Transactional
 	public void createPos() {
