@@ -6,7 +6,7 @@ spring:
     enabled: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/ddd?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/arch?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 1234
@@ -15,8 +15,14 @@ spring:
     hibernate:
       ddl-auto: create
     properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-    defer-datasource-initialization: true
+      hibernate: # logger 를 통해 로그 출력
+        show_sql: true # sql 보여주는 설정
+        format_sql: true # sql 정렬
+    defer-datasource-initialization: false # data.sql 또는 schema.sql 이 있을 때 사용한다.
     open-in-view: false
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm:jdbc.bind: trace # ? 파라미터 출력
+    org.hibernate.orm.connections.pooling: WARN

@@ -1,9 +1,5 @@
 package org.hyeonqz.architecturelab.clean.example1.application.command;
 
-import lombok.Getter;
-
-
-@Getter
 public record AddMerchantTerminalCommand(
         String merchantName,
         String posName) {
