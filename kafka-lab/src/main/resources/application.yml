@@ -22,4 +22,13 @@ spring:
     open-in-view: false
 
   kafka:
-    boostrap-servers: "localhost:29092"
+    boostrap-servers: "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094"
+
+
+hkjin:
+  kafka:
+    auto-offset-reset: earliest
+    topics:
+      realtime-transaction-batch:
+        name: "realtime-transaction-batch"
+        group-id: "realtime-transaction-batch-group"
