@@ -2,10 +2,9 @@ server:
   port: 8300
 
 spring:
-  # db
   datasource:
     driverClassName: org.h2.Driver
-    url: 'jdbc:h2:mem:jpa'
+    url: 'jdbc:h2:mem:vault'
     username: hkjin
     password: 1234
 
@@ -27,10 +26,10 @@ spring:
   # vault
   cloud:
     vault:
-      host: localhost
-      port: 8200
-      scheme: https
-      authentication: token
-      token: 1234567890000
-      connection-timeout: 5000
-      read-timeout: 15000
+      host: localhost # vault 접속 주소
+      port: 8200 # vault port -> 기본이 8200 임
+      scheme: https -> default 가 https 혹시라도 http 환경에 vault 가 활성화 되어있으면 Https 무력화 로직이 필요함
+      authentication: token # 로그인 인증 방식
+      token: 19aefa97-cccc-bbbb-aaaa-225940e63d76 # 로그인 토큰
+      connection-timeout: 5000 # 로그인 타임 아웃 5s
+      read-timeout: 15000 # 읽기 타임 아웃 15s

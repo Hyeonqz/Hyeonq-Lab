@@ -4,7 +4,7 @@ services:
     container_name: "spring-cloud-vault"
     image: hashicorp/vault:latest
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "1234567890000"
+      VAULT_DEV_ROOT_TOKEN_ID: 19aefa97-cccc-bbbb-aaaa-225940e63d76
     ports:
       - "8200:8200"
 
