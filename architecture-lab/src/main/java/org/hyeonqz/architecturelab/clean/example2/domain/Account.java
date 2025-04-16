@@ -3,6 +3,7 @@ package org.hyeonqz.architecturelab.clean.example2.domain;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public class Account {
