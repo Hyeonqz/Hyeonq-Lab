@@ -1,0 +1,11 @@
+### 단건 조회 MySQL
+GET http://127.0.0.1:9400/apis/rdb/205102
+
+### 전체 조회 MySQL
+GET http://127.0.0.1:9400/apis/rdb/all
+
+### 단건 조회 Redis
+GET http://127.0.0.1:9400/apis/redis/terminal:7b5a9e0a-15fe-4e5b-9c50-a31078551aea
+
+### 전체 조회 Redis
+GET http://127.0.0.1:9400/apis/redis/all

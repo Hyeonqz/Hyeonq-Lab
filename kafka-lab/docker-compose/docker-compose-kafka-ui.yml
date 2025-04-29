@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 services:
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -7,7 +7,7 @@ services:
       - "8989:8080"
     restart: always
     environment:
-      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_NAME=local-kafka
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:19092,kafka-2:19093,kafka-3:19094
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
     networks:
