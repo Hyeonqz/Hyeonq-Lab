@@ -31,25 +31,19 @@ public class Payment {
 
 	private LocalDateTime createdAt;
 
+	private String state;
+
 	@OneToMany(mappedBy = "payment")
 	private List<ProductItem> productItems = new ArrayList<>();
 
 	@Builder
-	public Payment (String transactionNo, BigDecimal amount, LocalDateTime createdAt, List<ProductItem> productItems) {
+	public Payment (String transactionNo, BigDecimal amount, LocalDateTime createdAt, String state,
+		List<ProductItem> productItems) {
 		this.transactionNo = transactionNo;
 		this.amount = amount;
 		this.createdAt = createdAt;
+		this.state = state;
 		this.productItems = productItems;
-	}
-
-	@Override
-	public String toString () {
-		return "Payment{" +
-			"id=" + id +
-			", transactionNo='" + transactionNo + '\'' +
-			", amount=" + amount +
-			", createAt=" + createdAt +
-			'}';
 	}
 
 }

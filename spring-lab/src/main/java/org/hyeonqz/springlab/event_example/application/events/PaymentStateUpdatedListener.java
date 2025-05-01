@@ -18,6 +18,6 @@ public class PaymentStateUpdatedListener {
 	@EventListener(PaymentStateUpdatedEvent.class)
 	@Transactional // 비동기 이므로 다른 트랜잭션을 이용한다.
 	public void paymentStateUpdated(PaymentStateUpdatedEvent event) {
-		paymentRepository.updateState(event.getRequestDto().amount());
+		// 이벤트 로직 발생
 	}
 }
