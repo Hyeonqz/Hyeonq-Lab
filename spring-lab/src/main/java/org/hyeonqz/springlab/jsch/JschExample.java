@@ -1,4 +1,4 @@
-package org.hyeonqz.springlab.example;
+package org.hyeonqz.springlab.jsch;
 
 import lombok.extern.slf4j.Slf4j;
 
