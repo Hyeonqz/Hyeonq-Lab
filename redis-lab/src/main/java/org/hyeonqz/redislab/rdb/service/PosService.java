@@ -9,15 +9,14 @@ import org.hyeonqz.redislab.rdb.repository.PosRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class PosService {
 	private final PosRepository posRepository;
 
-	public PosService (PosRepository posRepository) {
-		this.posRepository = posRepository;
-	}
-
+	@Transactional
 	public Pos createPos() {
 		Pos pos = Pos.builder()
 			.uuid(UUID.randomUUID())
@@ -29,6 +28,7 @@ public class PosService {
 		return pos;
 	}
 
+	@Transactional
 	public UUID getUuid(Long id) {
 		Pos pos = posRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("No such pos: " + id));
