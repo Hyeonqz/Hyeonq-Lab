@@ -2,8 +2,19 @@ server:
   port: 9300
 
 spring:
+  config:
+    import: application-secret.yml
+
   jmx:
     enabled: true
+
+  ai:
+    openai:
+      api-key: ${hkhjin.key}
+      chat:
+        options:
+          model: gpt-3.5-turbo
+      base-url: https://api.openai.com/v1/chat/completions
 
   datasource:
     url: jdbc:mysql://localhost:3306/ddd?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
