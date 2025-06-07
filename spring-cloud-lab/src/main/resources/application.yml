@@ -12,6 +12,7 @@ spring:
     console:
       enabled: true
       path: /h2-console # 접속: localhost:8300/h2-console
+
   # jpa
   jpa:
     hibernate:
@@ -28,8 +29,14 @@ spring:
     vault:
       host: localhost # vault 접속 주소
       port: 8200 # vault port -> 기본이 8200 임
-      scheme: https -> default 가 https 혹시라도 http 환경에 vault 가 활성화 되어있으면 Https 무력화 로직이 필요함
+      scheme: https # -> default 가 https 혹시라도 http 환경에 vault 가 활성화 되어있으면 Https 무력화 로직이 필요함
       authentication: token # 로그인 인증 방식
       token: 19aefa97-cccc-bbbb-aaaa-225940e63d76 # 로그인 토큰
       connection-timeout: 5000 # 로그인 타임 아웃 5s
       read-timeout: 15000 # 읽기 타임 아웃 15s
+
+  # eureka
+eureka:
+  client:
+    register-with-eureka: false   # 서버 자신은 등록하지 않음
+    fetch-registry: false         # 서버 자신은 레지스트리 정보 불러오지 않음
