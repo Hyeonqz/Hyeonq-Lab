@@ -1,3 +1,9 @@
+buildscript {
+    ext {
+        dataSourceVersion = '1.9.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.5'
@@ -39,6 +45,11 @@ dependencies {
     implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
     implementation 'org.springframework.ai:spring-ai-openai' // spring ai 추상화 컴포넌트 사용
     implementation 'org.springframework.ai:spring-ai-starter-model-openai' // 실제 open ai 연동
+
+    // database logging lib
+    implementation("com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:${dataSourceVersion}") //datasource-proxy
+    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:${dataSourceVersion}") // p6spy
+    //implementation("com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:${dataSourceVersion}") // flexyPool
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

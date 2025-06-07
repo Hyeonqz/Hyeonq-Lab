@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:test-lab-1
+    driver-class-name: org.h2.Driver
+    username: hkjin
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
