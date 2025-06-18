@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class KafkaProducer {
-	private final KafkaTemplate<String, String> kafkaTemplate;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
 
 	public void createMessage() {
-		kafkaTemplate.send("topic-1","hello kyu?");
+		kafkaTemplate.send("topic-1", new String("hello kafka"));
 	}
 }
