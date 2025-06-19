@@ -10,6 +10,21 @@
 
 ```
 
+### 1-1) Kafka Consumer 설정
+```properties
+spring.kafka.consumer.max-poll-records=6000
+spring.kafka.consumer.fetch-min-size=1MB
+spring.kafka.consumer.fetch-max-wait=10s
+```
+
+- max.poll.records -> poll 당 가져올 수 있는 최대 메시지 개수
+- fetch.min.bytes -> consume 할 메시지가 최소 1byte 라도 있으면 fetch 하는 것이 디폴트
+  - 설정을 만약 1MB 로 잡으면 메세지가 합쳐서 1MB 가 채워지지 않으면 fetch 하지 않음
+- fetch.max.wait.ms	-> fetch.min.bytes 가 채워지지 않았다면 최대 0.5s 동안 block 하는 것이 디폴트
+
+내 설정을 기준으로 설명을 하면 1MB 가 채워지거나, 6000개 레코드가 채워지지 않으면 10초 동안 기다려라
+
+
 ### 2. Kafka 메시지 유실 방지
 1. Redis 를 사용하여 메시지를 관리한다?
 2. Application 이 종료되기 전 @PreDestroy 를 사용하여 메시지를 모두 소비시킨다
