@@ -29,35 +29,59 @@ public class KafkaConsumerV2Service implements consumerService<List<ConsumerReco
         id = "payment-audit",
         containerFactory = "batchKafkaListenerContainerFactory",
         groupId = "${hkjin.kafka.topics.audit.group-id}",
-        topicPartitions = @TopicPartition(
-            topic = "${hkjin.kafka.topics.audit.name}",
-            partitions = {"0"}
-        ),
+        topics = "${hkjin.kafka.topics.audit.name}",
         concurrency = "1"
     )
     @Transactional
     @Override
-    public void consumeMessage (List<ConsumerRecord<String, KafkaMessage>> records, Acknowledgment acknowledgment) {
-        log.info("Payment Audit - Partition 1 Messages: {}", records.size());
+    public void consumeMessage(List<ConsumerRecord<String, KafkaMessage>> records, Acknowledgment acknowledgment) {
+        log.info("=== Batch Consumer Triggered ===");
+        log.info("Received batch size: {}", records.size());
 
-        Set<Integer> partitions = records.stream()
-            .map(ConsumerRecord::partition)
-            .collect(Collectors.toSet());
+        // 배치 처리 실행
+        this.processMessage(records);
+
+        // kafka 수동 commit
+        acknowledgment.acknowledge();
+        log.info("=== Batch Processing Completed ===");
+    }
+
+    private void processMessage(List<ConsumerRecord<String, KafkaMessage>> records) {
+        log.info("Payment Audit - Partition Messages Size: {}", records.size());
+
+        Set<Integer> partitions = getPartitions(records);
         log.info("Partitions: {}", partitions);
 
-        List<KafkaMetaData> list = records.stream()
-            .map(this::createKafkaMetaData)
-            .toList();
+        List<KafkaMetaData> list = getKafkaMetaDataList(records);
 
-        boolean isFull = records.size() == 100;
-        String trigger = isFull ? "MAX_POLL_RECORDS" : "FETCH_MAX_WAIT_MS";
+        // 배치 트리거 조건 확인
+        String trigger = determineTrigger(records.size());
 
         kafkaMetaRepository.saveAll(list);
-        acknowledgment.acknowledge();
+
         log.info("Success Processing Audit Batch: {}, trigger: {}", records.size(), trigger);
     }
 
-    private KafkaMetaData createKafkaMetaData (ConsumerRecord<String, KafkaMessage> record) {
+    private String determineTrigger(int batchSize) {
+        if (batchSize >= 3)
+            return "MAX_POLL_RECORDS"; // 3개 이상이면 크기 기준
+        else
+            return "FETCH_MAX_WAIT_MS"; // 6시간 타임아웃 기준
+    }
+
+    private Set<Integer> getPartitions(List<ConsumerRecord<String, KafkaMessage>> records) {
+        return records.stream()
+            .map(ConsumerRecord::partition)
+            .collect(Collectors.toSet());
+    }
+
+    private List<KafkaMetaData> getKafkaMetaDataList(List<ConsumerRecord<String, KafkaMessage>> records) {
+        return records.stream()
+            .map(this::createKafkaMetaData)
+            .toList();
+    }
+
+    private KafkaMetaData createKafkaMetaData(ConsumerRecord<String, KafkaMessage> record) {
         return KafkaMetaData.builder()
             .topics(record.topic())
             .partitions(String.valueOf(record.partition()))
@@ -69,5 +93,4 @@ public class KafkaConsumerV2Service implements consumerService<List<ConsumerReco
             .publishedTime(record.value().publishedTime())
             .build();
     }
-
 }

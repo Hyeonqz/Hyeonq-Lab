@@ -8,6 +8,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_INIT_LIMIT: 5
       ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
     container_name: zookeeper-1
     restart: on-failure
     networks:
@@ -15,44 +16,46 @@ services:
     ports:
       - "22181:2181"
     volumes:
-      - ./zookeeper-1/data:/data
-      - ./zookeeper-1/logs:/datalog
+      - ./zookeeper-1/data:/var/lib/zookeeper/data
+      - ./zookeeper-1/logs:/var/lib/zookeeper/log
 
   zookeeper-2:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_SERVER_ID: 2
-      ZOOKEEPER_CLIENT_PORT: 2182
+      ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_INIT_LIMIT: 5
       ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
     container_name: zookeeper-2
     restart: on-failure
     networks:
       - kafka_network
     ports:
-      - "22182:2182"
+      - "22182:2181"
     volumes:
-      - ./zookeeper-2/data:/data
-      - ./zookeeper-2/logs:/datalog
+      - ./zookeeper-2/data:/var/lib/zookeeper/data
+      - ./zookeeper-2/logs:/var/lib/zookeeper/log
 
   zookeeper-3:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_SERVER_ID: 3
-      ZOOKEEPER_CLIENT_PORT: 2183
+      ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_INIT_LIMIT: 5
       ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
     container_name: zookeeper-3
     restart: on-failure
     networks:
       - kafka_network
     ports:
-      - "22183:2183"
+      - "22183:2181"
     volumes:
-      - ./zookeeper-3/data:/data
-      - ./zookeeper-3/logs:/datalog
+      - ./zookeeper-3/data:/var/lib/zookeeper/data
+      - ./zookeeper-3/logs:/var/lib/zookeeper/log
 
   kafka-1:
     image: confluentinc/cp-kafka:latest
@@ -73,21 +76,28 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_NUM_PARTITIONS: 3
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper-1:2181,zookeeper-2:2182,zookeeper-3:2183"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_LISTENERS: INTERNAL://:19092,EXTERNAL://:9092,DOCKER://:29092
-      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-1:19092,EXTERNAL://127.0.0.1:9092,DOCKER://host.docker.internal:29092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-1:19092,EXTERNAL://localhost:9092,DOCKER://host.docker.internal:29092"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 3000
       KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS: 6000
       KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 60000
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
     volumes:
       - ./kafka-1/data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   kafka-2:
     image: confluentinc/cp-kafka:latest
@@ -108,22 +118,30 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper-1:2181,zookeeper-2:2182,zookeeper-3:2183"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_LISTENERS: INTERNAL://:19093,EXTERNAL://:9093,DOCKER://:29093
-      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-2:19093,EXTERNAL://127.0.0.1:9093,DOCKER://host.docker.internal:29093"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-2:19093,EXTERNAL://localhost:9093,DOCKER://host.docker.internal:29093"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 3000
       KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS: 6000
       KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 60000
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
     volumes:
       - ./kafka-2/data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9093"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+  # kafka broker-3
   kafka-3:
     image: confluentinc/cp-kafka:latest
     container_name: kafka-3
@@ -143,22 +161,30 @@ services:
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper-1:2181,zookeeper-2:2182,zookeeper-3:2183"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_LISTENERS: INTERNAL://:19094,EXTERNAL://:9094,DOCKER://:29094
-      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-3:19094,EXTERNAL://127.0.0.1:9094,DOCKER://host.docker.internal:29094"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka-3:19094,EXTERNAL://localhost:9094,DOCKER://host.docker.internal:29094"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT"
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 3000
       KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS: 6000
       KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 60000
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
     volumes:
       - ./kafka-3/data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9094"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   kafka_network:
     name: kafka_docker_net
+    driver: bridge

@@ -22,7 +22,7 @@ spring:
     open-in-view: false
 
   kafka:
-    boostrap-servers: "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094"
+    bootstrap-servers: "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094"
     consumer:
       auto-offset-reset: earliest
 
