@@ -12,6 +12,7 @@ import org.hyeonqz.kafkalab.batch_example.v1.entity.KafkaMetaData;
 import org.hyeonqz.kafkalab.batch_example.v1.repository.KafkaMetaRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class KafkaConsumerV2Service implements consumerService<List<ConsumerReco
         containerFactory = "batchKafkaListenerContainerFactory",
         groupId = "${hkjin.kafka.topics.audit.group-id}",
         topics = "${hkjin.kafka.topics.audit.name}",
-        concurrency = "1"
+        concurrency = "3"
     )
     @Transactional
     @Override
