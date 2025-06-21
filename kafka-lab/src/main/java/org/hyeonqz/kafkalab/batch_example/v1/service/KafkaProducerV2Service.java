@@ -1,4 +1,4 @@
-package org.hyeonqz.kafkalab.example2.service;
+package org.hyeonqz.kafkalab.batch_example.v1.service;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;

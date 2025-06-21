@@ -1,4 +1,4 @@
-package org.hyeonqz.kafkalab.example2.service;
+package org.hyeonqz.kafkalab.batch_example.v1.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,10 +8,9 @@ import java.util.stream.Collectors;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.hyeonqz.kafkalab.common.consumerService;
 import org.hyeonqz.kafkalab.common.messages.KafkaMessage;
-import org.hyeonqz.kafkalab.example2.entity.KafkaMetaData;
-import org.hyeonqz.kafkalab.example2.repository.KafkaMetaRepository;
+import org.hyeonqz.kafkalab.batch_example.v1.entity.KafkaMetaData;
+import org.hyeonqz.kafkalab.batch_example.v1.repository.KafkaMetaRepository;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,6 @@
 package org.hyeonqz.kafkalab.example2.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import org.hyeonqz.kafkalab.batch_example.v1.service.KafkaProducerV2Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

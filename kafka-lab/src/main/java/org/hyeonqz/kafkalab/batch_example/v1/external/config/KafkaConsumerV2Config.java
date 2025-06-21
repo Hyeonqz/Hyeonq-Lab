@@ -1,4 +1,4 @@
-package org.hyeonqz.kafkalab.example2.external.config;
+package org.hyeonqz.kafkalab.batch_example.v1.external.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,7 +78,7 @@ public class KafkaConsumerV2Config {
         factory.setBatchListener(true);
 
         // ✅ 배치 처리 전용 설정
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
 
         // ✅ 핵심: poll 간격을 6시간으로 설정
         factory.getContainerProperties().setIdleBetweenPolls(21600000L);    // 6시간

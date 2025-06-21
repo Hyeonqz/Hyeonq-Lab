@@ -1,4 +1,4 @@
-package org.hyeonqz.kafkalab.example2.entity;
+package org.hyeonqz.kafkalab.batch_example.v1.entity;
 
 import java.time.LocalDateTime;
 

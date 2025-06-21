@@ -1,6 +1,6 @@
-package org.hyeonqz.kafkalab.example2.presentation;
+package org.hyeonqz.kafkalab.batch_example.v1.presentation;
 
-import org.hyeonqz.kafkalab.example2.service.KafkaProducerV2Service;
+import org.hyeonqz.kafkalab.batch_example.v1.service.KafkaProducerV2Service;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
