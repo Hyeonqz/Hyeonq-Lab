@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hyeonqz.kafkalab.batch_example.v1.entity.KafkaMetaData;
 import org.hyeonqz.kafkalab.batch_example.v1.repository.KafkaMetaRepository;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,22 +18,41 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
-public class SchedulerService {
+public class SchedulerService implements DisposableBean {
     private final KafkaMetaRepository kafkaMetaRepository;
 
     private final List<KafkaMetaData> kafkaMetaDataList = Collections.synchronizedList(new ArrayList<>());
     private final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
 
-    @PreDestroy
+
+    /*
+    * Spring은 다음 순서로 종료:
+    * DataSource Bean 파괴
+    * JPA EntityManager 종료
+    * @PreDestroy 메서드 실행 ← 이때 DB 접근 불가 -> DisposableBean 을 사용하여 Bean 초기화전에 실행한다.
+    * -> IDE 에서 직접 종료하면 Kill-9 가 동작하여 로그 불가함.
+    * */
     @Transactional
-    public void preDestroy() {
-        log.info("=== PreDestroy 시작 kafkaMetaDataList 비우기 로직 실행");
+    @Override
+    public void destroy() throws Exception {
+        log.info("=== DisposableBean.destroy() 시작: kafkaMetaDataList 비우기 ===");
         isShuttingDown.set(true);
-        kafkaMetaRepository.saveAll(kafkaMetaDataList);
-        kafkaMetaDataListClear();
-        log.info("kafkaMetaDataList Clear() 완료");
+
+        try {
+            if (!kafkaMetaDataList.isEmpty()) {
+                List<KafkaMetaData> dataToSave = new ArrayList<>(kafkaMetaDataList);
+                kafkaMetaRepository.saveAll(dataToSave);
+                log.info("Graceful Shutdown: {} 건 저장 완료", dataToSave.size());
+            } else {
+                log.info("저장할 데이터가 없습니다.");
+            }
+        } catch (Exception e) {
+            log.error("Graceful Shutdown 중 DB 저장 실패", e);
+        } finally {
+            kafkaMetaDataListClear();
+            log.info("=== DisposableBean.destroy() 완료 ===");
+        }
     }
 
     @Scheduled(cron = "0 50 23 * * *", zone = "Asia/Seoul")
