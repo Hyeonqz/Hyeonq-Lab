@@ -1,7 +1,9 @@
 package org.hyeonqz.kafkalab.batch_example.v1.presentation;
 
 import org.hyeonqz.kafkalab.batch_example.v1.service.KafkaProducerV2Service;
+import org.hyeonqz.kafkalab.batch_example.v1.service.SchedulerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class KafkaTestController {
     private final KafkaProducerV2Service kafkaProducerV2Service;
+    private final SchedulerService schedulerService;
 
 
     @PostMapping("/apis/v1/produce")
@@ -18,5 +21,16 @@ public class KafkaTestController {
         kafkaProducerV2Service.produceMessage();
 
         return ResponseEntity.ok().body("Success");
+    }
+
+    @PostMapping("/apis/v1/batch/request")
+    public ResponseEntity<Void> request() {
+        schedulerService.doProcessKafkaMetaData();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/apis/v1/consumer/count")
+    public ResponseEntity<?> getConsumerCount() {
+        return ResponseEntity.ok(schedulerService.getKafkaMetaDataListCount());
     }
 }

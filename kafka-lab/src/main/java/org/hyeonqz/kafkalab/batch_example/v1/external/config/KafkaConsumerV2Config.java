@@ -82,7 +82,7 @@ public class KafkaConsumerV2Config {
         // ✅ 배치 처리 전용 설정
         factory.setConsumerFactory(batchConsumerFactory());
         factory.setBatchListener(true);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.BATCH);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 
 
         // Consumer 가 poll 시 빈값을 받았을 때 다음 poll 까지 대기 시간 -> broker 에 메시지가 없을 때만 적용되는 유휴 대기 시간 -> 메시지 있으면 즉시 poll
