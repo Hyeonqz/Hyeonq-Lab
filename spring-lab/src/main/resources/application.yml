@@ -5,15 +5,16 @@ spring:
   config:
     import: application-secret.yml
 
-  jmx:
-    enabled: true
-
-# spring jdbc dataSource
   datasource:
-    url: jdbc:mysql://localhost:3306/ddd?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
+    driverClassName: org.h2.Driver
+    url: 'jdbc:h2:mem:spring'
+    username: hkjin
     password: 1234
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console # 접속: localhost:8080/h2-console
 
 # spring jpa
   jpa:
@@ -50,7 +51,7 @@ management:
 decorator:
   # p6spy
   datasource:
-    enabled: true
+    enabled: false
     p6spy:
       enable-logging: true
       multiline: true

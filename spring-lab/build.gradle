@@ -29,17 +29,20 @@ dependencies {
     // SpringBoot
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // prometheus -> metric 수집
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    runtimeOnly ("io.micrometer:micrometer-registry-prometheus")
+
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // DB
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
 
     // Spring AI
     implementation platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT")
@@ -48,7 +51,7 @@ dependencies {
 
     // database logging lib
     implementation("com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:${dataSourceVersion}") //datasource-proxy
-    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:${dataSourceVersion}") // p6spy
+    // implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:${dataSourceVersion}") // p6spy
     //implementation("com.github.gavlyukovskiy:flexy-pool-spring-boot-starter:${dataSourceVersion}") // flexyPool
 
     // Test
