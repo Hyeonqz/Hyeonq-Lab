@@ -75,5 +75,8 @@ decorator:
 # logging
 logging:
   level:
+    root: INFO
     org:
-      hibernate.orm:
+      hyeonqz:
+        springlab: DEBUG  # 당신의 패키지 로그 레벨을 DEBUG로 설정
+      hibernate.orm: ERROR
