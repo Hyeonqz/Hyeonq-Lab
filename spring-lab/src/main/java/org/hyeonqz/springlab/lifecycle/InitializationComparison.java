@@ -1,4 +1,4 @@
-package org.hyeonqz.springlab;
+package org.hyeonqz.springlab.lifecycle;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
