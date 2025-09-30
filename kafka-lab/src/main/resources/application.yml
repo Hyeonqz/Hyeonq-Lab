@@ -26,9 +26,14 @@ spring:
     open-in-view: false
 
   kafka:
-    bootstrap-servers: "127.0.0.1:9092,127.0.0.1:9093,127.0.0.1:9094"
+    bootstrap-servers: "localhost:9092,localhost:9093,localhost:9094"
     consumer:
       auto-offset-reset: earliest
+      properties:
+        metadata.max.age.ms: 30000
+        reconnect.backoff.ms: 1000
+        reconnect.backoff.max.ms: 10000
+        request.timeout.ms: 30000
 
 hkjin:
   kafka:
