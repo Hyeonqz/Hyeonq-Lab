@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Kafka Broker 0 (Controller + Broker)
   kafka00:
     image: confluentinc/cp-kafka:latest
     hostname: kafka00
@@ -9,171 +8,166 @@ services:
     restart: unless-stopped
     ports:
       - "9092:9092"
-      - "10000:10000"  # 외부 접근용 EXTERNAL Listener
     environment:
-      # KRaft 설정
       KAFKA_NODE_ID: 0
       KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka00:9093,1@kafka01:9093,2@kafka02:9093'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka00:29093,1@kafka01:29093,2@kafka02:29093'
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
-      # Listeners 설정
-      KAFKA_LISTENERS: PLAINTEXT://kafka00:9092,CONTROLLER://kafka00:9093,EXTERNAL://0.0.0.0:10000
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka00:9092,EXTERNAL://localhost:10000
+      KAFKA_LISTENERS: PLAINTEXT://kafka00:19092,CONTROLLER://kafka00:29093,EXTERNAL://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka00:19092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
-      # 클러스터 ID (모든 브로커에서 동일해야 함)
       CLUSTER_ID: 'HsDKs916UmQq7Y5E6bNlw'
-
-      # 복제 설정
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_IN_SYNC_REPLICAS: 2
-
-      # 토픽 자동 생성 설정
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_NUM_PARTITIONS: 4
-
-      # 성능 최적화
       KAFKA_LOG_RETENTION_HOURS: 24
-      KAFKA_LOG_SEGMENT_BYTES: 1073741824  # 1GB
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
-
-      # JVM 힙 메모리 설정
       KAFKA_HEAP_OPTS: "-Xmx1G -Xms1G"
-
     volumes:
-      - kafka00:/confluence/kafka
+      - kafka00:/var/lib/kafka/data
     networks:
       - kafka_network
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
-      interval: 30s
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka00:19092 || exit 1"]
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 45s
 
-  # Kafka Broker 1 (Controller + Broker)
   kafka01:
     image: confluentinc/cp-kafka:latest
     hostname: kafka01
     container_name: kafka01
     restart: unless-stopped
     ports:
-      - "9093:9092"
-      - "10001:10001"
+      - "9093:9093"
     environment:
-      # KRaft 설정
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka00:9093,1@kafka01:9093,2@kafka02:9093'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka00:29093,1@kafka01:29093,2@kafka02:29093'
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
-      # Listeners 설정
-      KAFKA_LISTENERS: PLAINTEXT://kafka01:9092,CONTROLLER://kafka01:9093,EXTERNAL://0.0.0.0:10001
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka01:9092,EXTERNAL://localhost:10001
+      # ✅ 수정: CONTROLLER를 29093으로 변경
+      KAFKA_LISTENERS: PLAINTEXT://kafka01:19092,CONTROLLER://kafka01:29093,EXTERNAL://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka01:19092,EXTERNAL://localhost:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
-      # 클러스터 ID
       CLUSTER_ID: 'HsDKs916UmQq7Y5E6bNlw'
-
-      # 복제 설정
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_IN_SYNC_REPLICAS: 2
-
-      # 토픽 자동 생성 설정
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_NUM_PARTITIONS: 4
-
-      # 성능 최적화
       KAFKA_LOG_RETENTION_HOURS: 24
       KAFKA_LOG_SEGMENT_BYTES: 1073741824
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
-
-      # JVM 힙 메모리 설정
       KAFKA_HEAP_OPTS: "-Xmx1G -Xms1G"
-
     volumes:
-      - kafka01:/confluence/kafka
+      - kafka01:/var/lib/kafka/data
     networks:
       - kafka_network
     depends_on:
-      - kafka00
+      kafka00:
+        condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
-      interval: 30s
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka01:19092 || exit 1"]
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 45s
 
-  # Kafka Broker 2 (Controller + Broker)
   kafka02:
     image: confluentinc/cp-kafka:latest
     hostname: kafka02
     container_name: kafka02
     restart: unless-stopped
     ports:
-      - "9094:9092"
-      - "10002:10002"
+      - "9094:9094"
     environment:
-      # KRaft 설정
       KAFKA_NODE_ID: 2
       KAFKA_PROCESS_ROLES: controller,broker
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka00:9093,1@kafka01:9093,2@kafka02:9093'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '0@kafka00:29093,1@kafka01:29093,2@kafka02:29093'
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
-      # Listeners 설정
-      KAFKA_LISTENERS: PLAINTEXT://kafka02:9092,CONTROLLER://kafka02:9093,EXTERNAL://0.0.0.0:10002
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka02:9092,EXTERNAL://localhost:10002
+      KAFKA_LISTENERS: PLAINTEXT://kafka02:19092,CONTROLLER://kafka02:29093,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka02:19092,EXTERNAL://localhost:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
-      # 클러스터 ID
       CLUSTER_ID: 'HsDKs916UmQq7Y5E6bNlw'
-
-      # 복제 설정
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_IN_SYNC_REPLICAS: 2
-
-      # 토픽 자동 생성 설정
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_NUM_PARTITIONS: 4
-
-      # 성능 최적화
       KAFKA_LOG_RETENTION_HOURS: 24
       KAFKA_LOG_SEGMENT_BYTES: 1073741824
       KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
-
-      # JVM 힙 메모리 설정
       KAFKA_HEAP_OPTS: "-Xmx1G -Xms1G"
-
     volumes:
-      - kafka02:/confluence/kafka
+      - kafka02:/var/lib/kafka/data
     networks:
       - kafka_network
     depends_on:
-      - kafka00
-      - kafka01
+      kafka00:
+        condition: service_started
+      kafka01:
+        condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
-      interval: 30s
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka02:19092 || exit 1"]
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 45s
 
-# network bridge
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    hostname: kafka-ui
+    container_name: kafka-ui
+    restart: unless-stopped
+    ports:
+      - "8989:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-kafka-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka00:19092,kafka01:19092,kafka02:19092
+      KAFKA_CLUSTERS_0_READONLY: false
+      AUTH_TYPE: "DISABLED"
+      MANAGEMENT_HEALTH_LDAP_ENABLED: false
+      JAVA_OPTS: "-Xms512m -Xmx1g"
+    depends_on:
+      kafka00:
+        condition: service_healthy
+      kafka01:
+        condition: service_healthy
+      kafka02:
+        condition: service_healthy
+    networks:
+      - kafka_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
 networks:
   kafka_network:
+    name: kraft_kafka_network
     driver: bridge
 
-# kafka metadata volume
 volumes:
   kafka00:
     driver: local
