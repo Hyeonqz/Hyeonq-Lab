@@ -1,5 +1,5 @@
 package org.hyeonqz.kafkalab.domain.service;
 
-public interface produceService<T> {
+public interface ProduceService<T> {
     void produceMessage(T data);
 }

@@ -6,7 +6,7 @@ plugins {
     id "me.champeau.jmh" version "0.7.2"
 }
 
-group = 'org.hyeonqz'
+group = 'org.hyeonqz.kafkalab'
 version = '0.0.1-SNAPSHOT'
 
 java {

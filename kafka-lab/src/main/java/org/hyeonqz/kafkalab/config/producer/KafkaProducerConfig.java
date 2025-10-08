@@ -1,8 +1,5 @@
 package org.hyeonqz.kafkalab.config.producer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +9,9 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -34,10 +34,10 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000); // 프로듀서가 데이터 전송 시 서버로부터 응답을 받기 위해 얼마 까지 기다릴 수 있는지 결정 (전송 포기 대기 시간까지 포함한다)
         configProps.put(ProducerConfig.LINGER_MS_CONFIG, 1000); // 현재 배치 전송하기 전까지 대기하는 시간을 결정 -> linger.ms 제한시간이 되었을 때 메시지 배치를 전송한다.
         configProps.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432); // 메시지 전송 전 메시지를 대기시키는 버퍼의 크기 결정
-        configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "zip"); // 메시지를 압축해서 보내야 할 떄 (압축 성능 및 네트워크 대역폭 모두가 중요할 때 권장)
+        configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "none"); // 메시지를 압축해서 보내야 할 떄 (압축 성능 및 네트워크 대역폭 모두가 중요할 때 권장)
         configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, 100000); // 같은 파티션에 다수의 레코드가 전송될 경우 배치 단위로 한꺼번에 전송한다. -> 위 매개변수는 각 배치에 사용될 메모리의 양을 결정한다(바이트)
         configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5); // 프로듀서가 서버로부터 응답을 받지 못한 상태에서 전송할 수 있는 최대 메시지 개수 결정 -> 위 값을 올리면 메모리 사용량이 증가하지만, 처리량 증가
-        configProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 1); // 프로듀서가 전송하는 쓰기 요청의 크기 결정
+        configProps.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 1000); // 프로듀서가 전송하는 쓰기 요청의 크기 결정 ex) 1000kb = 1mb
 
         // 2-1) 메시지 전송 실패시 재시도 관련
         // 아래 설정을 조정을 권장하지 않고, delivery.timeout.ms 를 조정하기를 권장한다!

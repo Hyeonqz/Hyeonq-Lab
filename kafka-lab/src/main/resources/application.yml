@@ -22,8 +22,8 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-    defer-datasource-initialization: true
-    open-in-view: false
+        use_sql_comments: true
+    show-sql: true
 
   kafka:
     bootstrap-servers: "localhost:9092,localhost:9093,localhost:9094"
@@ -44,3 +44,6 @@ hkjin:
       audit:
         name: "toy-audit"
         group-id: "payment-audit"
+      log:
+        name: "payment-log"
+        group-id: "payment-log-process-group"
