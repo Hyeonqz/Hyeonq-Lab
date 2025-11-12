@@ -16,6 +16,11 @@ spring:
       enabled: true
       path: /h2-console # 접속: localhost:8080/h2-console
 
+  # 스케쥴러 사이즈 조절
+  task:
+    scheduling:
+      pool:
+        size: 5
 # spring jpa
   jpa:
     hibernate:
