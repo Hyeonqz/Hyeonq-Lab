@@ -43,3 +43,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Secret application YAMLs (do not commit)
+application-secret*.yml
+application-secert*.yml

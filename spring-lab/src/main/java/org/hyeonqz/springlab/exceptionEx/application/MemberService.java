@@ -1,7 +1,7 @@
 package org.hyeonqz.springlab.exceptionEx.application;
 
-import org.hyeonqz.springlab.exceptionEx.MemberErrorCode;
-import org.hyeonqz.springlab.exceptionEx.MemberException;
+import org.hyeonqz.springlab.exceptionEx.shared.MemberErrorCode;
+import org.hyeonqz.springlab.exceptionEx.shared.MemberException;
 import org.hyeonqz.springlab.exceptionEx.domain.Member;
 import org.hyeonqz.springlab.exceptionEx.infrastructure.MemberRepository;
 import org.springframework.stereotype.Service;

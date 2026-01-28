@@ -1,4 +1,4 @@
-package org.hyeonqz.springlab.exceptionEx;
+package org.hyeonqz.springlab.exceptionEx.shared;
 
 import org.springframework.validation.Errors;
 

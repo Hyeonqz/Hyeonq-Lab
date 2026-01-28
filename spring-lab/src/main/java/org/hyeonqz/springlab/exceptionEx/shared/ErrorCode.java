@@ -1,4 +1,4 @@
-package org.hyeonqz.springlab.exceptionEx;
+package org.hyeonqz.springlab.exceptionEx.shared;
 
 public interface ErrorCode {
 	String getCode ();
