@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: kotlin-lab
+
+  # RDB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/kotlin_lab?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: root
+    password: root1234
+    hikari:
+      maximum-pool-size: 10        # 의도적으로 낮게 설정 (풀 고갈 재현)
+      minimum-idle: 5
+      connection-timeout: 5000     # 5초 — 빠른 실패 확인용
+      leak-detection-threshold: 2000
+
+  # JPA
+  jpa:
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+    hibernate:
+      ddl-auto: update
+
+# HikariCP 메트릭 노출
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics
+  metrics:
+    tags:
+      application: osiv-benchmark
