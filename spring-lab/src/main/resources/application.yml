@@ -1,55 +1,20 @@
 server:
   port: 9300
 
+# logging
+logging:
+  level:
+    root: INFO
+    org.hyeonqz.springlab: DEBUG
+
 spring:
   config:
-    import: application-secret.yml
+    imports:
+      - application-secret.yml
+      - datasoruce/datasource.yml
+      - ai/ai.yml
 
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:mem:spring'
-    username: hkjin
-    password: 1234
-
-    # Connection Pool
-    hikari:
-      maximum-pool-size: 4
-      minimum-idle: 2
-      idle-timeout: 60000
-      connection-timeout: 30000
-      max-lifetime: 1800000
-      connection-test-query: SELECT 1
-      validation-timeout: 5000
-      leak-detection-threshold: 60000
-      pool-name: TestHikariPool
-      auto-commit: true
-      read-only: false
-
-  # spring jpa
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: false
-        show_sql: false
-    defer-datasource-initialization: true
-    open-in-view: false
-
-  # H2
-  h2:
-    console:
-      enabled: true
-      path: /h2-console # 접속: localhost:8080/h2-console
-
-  # 스케쥴러 사이즈 조절
-  task:
-    scheduling:
-      pool:
-        size: 5
-
-
-# spring ai
+  # spring ai
   ai:
     openai:
       api-key: ${hkhjin.key}
@@ -57,6 +22,12 @@ spring:
         options:
           model: gpt-3.5-turbo
       base-url: https://api.openai.com/v1/chat/completions
+
+  # 스케쥴러 사이즈 조절
+  task:
+    scheduling:
+      pool:
+        size: 5
 
 # spring actuator
 management:
@@ -92,13 +63,3 @@ decorator:
       multiline: true
       format-sql: true
       count-query: true # 쿼리 메트릭 실행
-
-
-# logging
-logging:
-  level:
-    root: INFO
-    org:
-      hyeonqz:
-        springlab: DEBUG  # 당신의 패키지 로그 레벨을 DEBUG로 설정
-      hibernate.orm: ERROR

@@ -1,13 +1,14 @@
 # Claude Code Configuration - Backend Service
 
 ## Project Context
+.claude/contexts/project-context.md 위 문서를 항상 읽고 시작한다.
 
 ## Development Workflow
 
 ### Phase 1: Planning (필수)
 모든 작업 요청은 **즉시 실행하지 않고** 다음 절차를 따릅니다:
 
-1. 요청사항 분석 후 `.claude/plans/YYYYMMDD_HHmmss_[task-name].md` 생성
+1. 요청사항 분석 후 `.claude/docs/YYYYMMDD_[task-name].md` 생성
 2. 실행 계획 내용:
     - 작업 목표 및 범위
     - 영향받는 컴포넌트 목록

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "org.hyeonqz.kotlinlab"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 description = "kotlin-lab"
 
 java {
@@ -26,6 +26,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
+    // caffeine cache
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
 
     // Kotlin

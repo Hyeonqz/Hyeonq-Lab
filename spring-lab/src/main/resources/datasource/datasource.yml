@@ -1,0 +1,39 @@
+spring:
+
+  # H2 DB
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: 'jdbc:h2:mem:spring'
+    username: hkjin
+    password: 1234
+
+  # H2
+  h2:
+    console:
+      enabled: true
+      path: /h2-console # 접속: localhost:8080/h2-console
+
+    # Connection Pool
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 2
+      idle-timeout: 60000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+      validation-timeout: 5000
+      leak-detection-threshold: 60000
+      pool-name: TestHikariPool
+      auto-commit: true
+      read-only: false
+
+  # spring jpa
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+    defer-datasource-initialization: true
+    open-in-view: false
