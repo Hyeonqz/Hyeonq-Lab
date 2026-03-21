@@ -1,18 +1,13 @@
 server:
   port: 9300
 
-# logging
-logging:
-  level:
-    root: INFO
-    org.hyeonqz.springlab: DEBUG
-
 spring:
   config:
     imports:
       - application-secret.yml
       - datasoruce/datasource.yml
-      - ai/ai.yml
+      - monitor/monitor.yml
+      - logging/logging.yml
 
   # spring ai
   ai:
@@ -28,38 +23,3 @@ spring:
     scheduling:
       pool:
         size: 5
-
-# spring actuator
-management:
-  endpoint:
-    health:
-      show-details: always
-
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-# decorator
-decorator:
-  # p6spy
-  datasource:
-    enabled: false
-    p6spy:
-      enable-logging: true
-      multiline: true
-      logging: slf4j
-
-    # proxy
-    datasource-proxy:
-      logging: slf4j
-      query:
-        enable-logging: true
-        log-level: DEBUG
-      slow-query:
-        enable-logging: true
-        log-level: WARN
-        threshold: 1000
-      multiline: true
-      format-sql: true
-      count-query: true # 쿼리 메트릭 실행

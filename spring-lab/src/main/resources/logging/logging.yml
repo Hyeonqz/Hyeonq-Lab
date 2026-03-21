@@ -1,0 +1,29 @@
+# logging
+logging:
+  level:
+    root: INFO
+    org.hyeonqz.springlab: DEBUG
+
+# decorator
+decorator:
+  # p6spy
+  datasource:
+    enabled: false
+    p6spy:
+      enable-logging: true
+      multiline: true
+      logging: slf4j
+
+    # proxy
+    datasource-proxy:
+      logging: slf4j
+      query:
+        enable-logging: true
+        log-level: DEBUG
+      slow-query:
+        enable-logging: true
+        log-level: WARN
+        threshold: 1000
+      multiline: true
+      format-sql: true
+      count-query: true # 쿼리 메트릭 실행
