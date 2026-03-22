@@ -1,0 +1,17 @@
+# SFTP Image
+services:
+  sftp:
+    container_name: spring-lab-sftp
+    image: atmoz/sftp
+    platform: linux/amd64
+    ports:
+      - "2222:22"
+    command: test:test:::upload  # user:password:::directory
+
+# 사용 가이드
+# docker-compose down
+# docker-compose up -d
+
+# 접속 가이드
+# 접속: sftp -P 2222 test@localhost
+# PW 입력: test

@@ -4,22 +4,26 @@ server:
 spring:
   config:
     imports:
-      - application-secret.yml
-      - datasoruce/datasource.yml
-      - monitor/monitor.yml
-      - logging/logging.yml
-
-  # spring ai
-  ai:
-    openai:
-      api-key: ${hkhjin.key}
-      chat:
-        options:
-          model: gpt-3.5-turbo
-      base-url: https://api.openai.com/v1/chat/completions
+      - classpath:application-secret.yml
+      - classpath:datasource/datasource.yml
+      - classpath:monitor/monitor.yml
+      - classpath:logging/logging.yml
 
   # 스케쥴러 사이즈 조절
   task:
     scheduling:
       pool:
         size: 5
+
+# SFTP
+sftp:
+  host: localhost      # SFTP 서버 호스트
+  port: 2222
+  username: test
+  password: test
+  upload-dir: /home/test/upload  # 업로드 디렉토리
+  pool:
+    max-total: 5       # 최대 세션 수
+    max-idle: 3        # 최대 유휴 세션 수
+    min-idle: 1        # 최소 유휴 세션 수
+    max-wait-millis: 3000  # 세션 대기 타임아웃

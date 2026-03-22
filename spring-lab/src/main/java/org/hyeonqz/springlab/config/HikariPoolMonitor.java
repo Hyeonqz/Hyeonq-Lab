@@ -22,7 +22,7 @@ public class HikariPoolMonitor {
         monitorHikariCp();
     }
 
-    @Scheduled(fixedRate = 60000) // 60초 주기
+    @Scheduled(fixedRate = 6000000) // 60초 주기
     public void monitorHikariCp() {
         if(dataSource instanceof HikariDataSource hikariDataSource) {
             HikariPoolMXBean poolMXBean = hikariDataSource.getHikariPoolMXBean();

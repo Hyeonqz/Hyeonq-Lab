@@ -24,10 +24,10 @@ public class ApplicationContextAwareExample implements ApplicationContextAware {
         this.applicationContext = applicationContext;
         
         log.info("🔧 ApplicationContextAware.setApplicationContext() 호출");
-        log.info("   - 현재 시각: {}", LocalDateTime.now());
-        log.info("   - 스레드: {}", Thread.currentThread().getName());
-        log.info("   - 빈 개수: {}", applicationContext.getBeanDefinitionCount());
-        log.info("   - ApplicationContext 타입: {}", applicationContext.getClass().getSimpleName());
+        log.info("   - CurrentTime: {}", LocalDateTime.now());
+        log.info("   - ThreadName: {}", Thread.currentThread().getName());
+        log.info("   - Bean 개수: {}", applicationContext.getBeanDefinitionCount());
+        log.info("   - ApplicationContextType: {}", applicationContext.getClass().getSimpleName());
         
         // ApplicationContext를 통해 다른 빈에 접근 가능
         String[] beanNames = applicationContext.getBeanDefinitionNames();

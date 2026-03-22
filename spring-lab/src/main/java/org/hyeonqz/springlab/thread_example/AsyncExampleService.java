@@ -31,9 +31,6 @@ public class AsyncExampleService {
         log.info("=======================");
     }
 
-
-
-
     @Async
     // @EventListener
     public void eventAsyncMethod() {
@@ -44,7 +41,7 @@ public class AsyncExampleService {
     }
 
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 10000000)
     public void scheduledMethod() {
         log.info("ThreadPoolTaskExecutor 자동으로 사용");
         log.info("기본으로 단일 스레드 1개를 사욜하지만");
@@ -57,7 +54,7 @@ public class AsyncExampleService {
                 + "위 설정을 적용하자");
     }
 
-    @Scheduled(fixedRate = 20000)
+    @Scheduled(fixedRate = 20000000)
     public void scheduledMethod2() {
         log.info("ThreadPoolTaskExecutor 자동으로 사용");
         log.info("기본으로 단일 스레드 1개를 사욜하지만");
@@ -70,7 +67,7 @@ public class AsyncExampleService {
                 + "위 설정을 적용하자");
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 30000000)
     public void scheduledMethod3() {
         log.info("ThreadPoolTaskExecutor 자동으로 사용");
         log.info("기본으로 단일 스레드 1개를 사욜하지만");
