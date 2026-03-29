@@ -181,10 +181,10 @@ public Flux<ServerSentEvent<Event>> subscribe() {
 
 ```bash
 # 구독 (터미널 1)
-curl -N http://localhost:8080/api/sse/subscribe
+curl -N http://localhost:15867/api/sse/subscribe
 
 # 이벤트 발행 (터미널 2)
-curl -X POST http://localhost:8080/api/sse/publish \
+curl -X POST http://localhost:15867/api/sse/publish \
   -H "Content-Type: application/json" \
   -d '{"type":"order","payload":"order-123"}'
 ```
