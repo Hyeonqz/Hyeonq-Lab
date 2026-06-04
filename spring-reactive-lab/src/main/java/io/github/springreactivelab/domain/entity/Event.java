@@ -1,15 +1,18 @@
 package io.github.springreactivelab.domain.entity;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Table("event")
 @Getter
+@NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class Event {
 
     @Id
@@ -20,10 +23,10 @@ public class Event {
     private String payload;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Builder
-    public Event(Long id, String type, String payload, LocalDateTime createdAt) {
+    public Event(Long id, String type, String payload, Instant createdAt) {
         this.id = id;
         this.type = type;
         this.payload = payload;

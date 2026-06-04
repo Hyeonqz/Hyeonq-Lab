@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE Lab</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; padding: 24px; }
+        h1 { font-size: 1.5rem; margin-bottom: 16px; color: #1a73e8; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .tab { padding: 10px 24px; cursor: pointer; font-size: 0.95rem; font-weight: 600; color: #888; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .tab:hover { color: #555; background: #e8ecf0; }
+        .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Layout */
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+        .panel { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .panel h2 { font-size: 0.95rem; margin-bottom: 12px; background: #1a73e8; display: inline-block; padding: 4px 14px; border-radius: 4px; color: #fff; }
+        label { display: block; font-size: 0.85rem; margin: 10px 0 4px; color: #666; }
+        input, textarea, select { width: 100%; padding: 9px 10px; border-radius: 6px; border: 1px solid #ccc; background: #fafafa; color: #333; font-size: 0.9rem; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #1a73e8; background: #fff; }
+        textarea { height: 60px; resize: vertical; }
+        button { margin-top: 10px; padding: 9px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: background 0.15s; }
+        .btn-primary { background: #1a73e8; color: #fff; }
+        .btn-primary:hover { background: #1558b0; }
+        .btn-success { background: #34a853; color: #fff; }
+        .btn-success:hover { background: #2b8a44; }
+        .btn-danger { background: #ea4335; color: #fff; }
+        .btn-danger:hover { background: #c5332a; }
+        .btn-secondary { background: #dadce0; color: #555; }
+        .btn-secondary:hover { background: #c5c8cc; }
+        .btn-sm { margin-top: 0; font-size: 0.8rem; padding: 5px 14px; }
+
+        /* Status */
+        .status { font-size: 0.8rem; margin-top: 8px; }
+        .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .dot.connected { background: #34a853; }
+        .dot.disconnected { background: #ea4335; }
+
+        /* Event Log */
+        .event-log { background: #f7f8fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; height: 420px; overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.82rem; line-height: 1.7; }
+        .log-entry { border-bottom: 1px solid #eee; padding: 5px 0; }
+        .log-time { color: #999; }
+        .log-type { color: #1a73e8; font-weight: bold; }
+        .log-payload { color: #0d652d; }
+        .log-system { color: #e8710a; }
+
+        /* Batch specific */
+        .batch-row { display: flex; gap: 12px; align-items: flex-end; }
+        .batch-row > div { flex: 1; }
+        .progress-bar { width: 100%; height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #1a73e8; border-radius: 3px; transition: width 0.3s; width: 0%; }
+        .stats { display: flex; gap: 16px; margin-top: 10px; font-size: 0.85rem; color: #666; }
+        .stats span { font-weight: 600; color: #333; }
+    </style>
+</head>
+<body>
+<h1>SSE (Server-Sent Events) Lab</h1>
+
+<!-- Tabs -->
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('single')">Single Event</div>
+    <div class="tab" onclick="switchTab('batch')">Batch Events</div>
+    <div class="tab" onclick="switchTab('history')">History</div>
+</div>
+
+<!-- Tab 1: Single Event -->
+<div id="tab-single" class="tab-content active">
+    <div class="container">
+        <div>
+            <!-- Subscribe -->
+            <div class="panel">
+                <h2>Subscribe</h2>
+                <p style="font-size:0.85rem; color:#888;">SSE 스트림에 연결하여 실시간 이벤트를 수신합니다.</p>
+                <div style="margin-top:12px;">
+                    <button class="btn-success" onclick="connect()">Connect</button>
+                    <button class="btn-secondary" onclick="disconnect()">Disconnect</button>
+                </div>
+                <div class="status" id="conn-status">
+                    <span class="dot disconnected"></span> Disconnected
+                </div>
+            </div>
+
+            <!-- Publish -->
+            <div class="panel" style="margin-top:16px;">
+                <h2>Publish</h2>
+                <label for="event-type">Event Type</label>
+                <input type="text" id="event-type" value="order" placeholder="e.g. order, payment, notification">
+                <label for="event-payload">Payload</label>
+                <textarea id="event-payload" placeholder="e.g. order-123">order-123</textarea>
+                <button class="btn-primary" onclick="publish()">Publish Event</button>
+                <div id="publish-result" style="font-size:0.8rem; margin-top:8px; color:#888;"></div>
+            </div>
+        </div>
+
+        <!-- Event Log -->
+        <div class="panel">
+            <h2>Event Log</h2>
+            <div style="margin-bottom:8px; display:flex; align-items:center; gap:12px;">
+                <button class="btn-secondary btn-sm" onclick="clearLog()">Clear</button>
+                <span style="font-size:0.8rem; color:#999;">count: <span id="event-count">0</span></span>
+            </div>
+            <div class="event-log" id="event-log"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab 2: Batch Events -->
+<div id="tab-batch" class="tab-content">
+    <div class="container">
+        <div>
+            <div class="panel">
+                <h2>Batch Publish</h2>
+                <p style="font-size:0.85rem; color:#888;">여러 이벤트를 한번에 발행하여 대량 처리를 테스트합니다.</p>
+                <label for="batch-type">Event Type</label>
+                <input type="text" id="batch-type" value="order" placeholder="e.g. order, payment">
+                <label for="batch-prefix">Payload Prefix</label>
+                <input type="text" id="batch-prefix" value="batch-item" placeholder="e.g. batch-item">
+                <div class="batch-row">
+                    <div>
+                        <label for="batch-count">Count</label>
+                        <input type="number" id="batch-count" value="10" min="1" max="1000">
+                    </div>
+                    <div>
+                        <label for="batch-interval">Interval (ms)</label>
+                        <input type="number" id="batch-interval" value="200" min="0" max="5000">
+                    </div>
+                </div>
+                <button class="btn-primary" id="batch-start-btn" onclick="startBatch()">Start Batch</button>
+                <button class="btn-danger btn-sm" id="batch-stop-btn" onclick="stopBatch()" style="display:none;">Stop</button>
+                <div class="progress-bar"><div class="progress-fill" id="batch-progress"></div></div>
+                <div class="stats">
+                    <div>Sent: <span id="batch-sent">0</span></div>
+                    <div>Success: <span id="batch-success">0</span></div>
+                    <div>Failed: <span id="batch-failed">0</span></div>
+                    <div>Elapsed: <span id="batch-elapsed">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Event Log (shared) -->
+        <div class="panel">
+            <h2>Event Log</h2>
+            <div style="margin-bottom:8px; display:flex; align-items:center; gap:12px;">
+                <button class="btn-secondary btn-sm" onclick="clearLog()">Clear</button>
+                <span style="font-size:0.8rem; color:#999;">count: <span id="event-count-batch">0</span></span>
+            </div>
+            <div class="event-log" id="event-log-batch"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab 3: History -->
+<div id="tab-history" class="tab-content">
+    <div style="max-width: 1100px;">
+        <div class="panel">
+            <h2>Event History</h2>
+            <p style="font-size:0.85rem; color:#888; margin-bottom:12px;">DB에 저장된 이벤트 목록을 조회합니다.</p>
+            <button class="btn-primary" onclick="loadHistory()">Reload</button>
+            <div id="history-content" style="margin-top:16px;">
+                <p style="color:#999; font-size:0.85rem;">조회 버튼을 클릭하세요.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ========== Tab ========== */
+    function switchTab(name) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    /* ========== SSE Connection ========== */
+    let eventSource = null;
+    let eventCount = 0;
+
+    function connect() {
+        if (eventSource) disconnect();
+        eventSource = new EventSource('/api/sse/subscribe');
+
+        eventSource.onopen = function () {
+            setStatus(true);
+            appendLog('system', 'Connected to SSE stream');
+        };
+
+        eventSource.addEventListener('order', handleEvent);
+        eventSource.addEventListener('payment', handleEvent);
+        eventSource.addEventListener('notification', handleEvent);
+
+        eventSource.onmessage = function (e) { handleEvent(e); };
+
+        eventSource.onerror = function () {
+            if (eventSource.readyState === EventSource.CLOSED) {
+                setStatus(false);
+                appendLog('system', 'Connection closed by server');
+            } else {
+                appendLog('system', 'Connection error, reconnecting...');
+            }
+        };
+    }
+
+    function handleEvent(e) {
+        try {
+            const data = JSON.parse(e.data);
+            appendLog('event', e.type || 'message', data);
+        } catch (err) {
+            appendLog('event', e.type || 'message', e.data);
+        }
+    }
+
+    function disconnect() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+            setStatus(false);
+            appendLog('system', 'Disconnected');
+        }
+    }
+
+    function setStatus(connected) {
+        const el = document.getElementById('conn-status');
+        el.innerHTML = connected
+            ? '<span class="dot connected"></span> Connected'
+            : '<span class="dot disconnected"></span> Disconnected';
+    }
+
+    /* ========== Single Publish ========== */
+    function publish() {
+        const type = document.getElementById('event-type').value;
+        const payload = document.getElementById('event-payload').value;
+        const resultEl = document.getElementById('publish-result');
+
+        fetch('/api/sse/publish', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type: type, payload: payload})
+        })
+        .then(res => res.json())
+        .then(data => {
+            resultEl.innerHTML = '<span style="color:#34a853;">Published: id=' + data.id + '</span>';
+        })
+        .catch(err => {
+            resultEl.innerHTML = '<span style="color:#ea4335;">Error: ' + err.message + '</span>';
+        });
+    }
+
+    /* ========== Batch Publish ========== */
+    let batchTimer = null;
+
+    function startBatch() {
+        const type = document.getElementById('batch-type').value;
+        const prefix = document.getElementById('batch-prefix').value;
+        const count = parseInt(document.getElementById('batch-count').value);
+        const interval = parseInt(document.getElementById('batch-interval').value);
+
+        let sent = 0, success = 0, failed = 0;
+        const startTime = Date.now();
+
+        document.getElementById('batch-start-btn').style.display = 'none';
+        document.getElementById('batch-stop-btn').style.display = 'inline-block';
+
+        function updateStats() {
+            document.getElementById('batch-sent').textContent = sent;
+            document.getElementById('batch-success').textContent = success;
+            document.getElementById('batch-failed').textContent = failed;
+            document.getElementById('batch-progress').style.width = (sent / count * 100) + '%';
+            document.getElementById('batch-elapsed').textContent = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
+        }
+
+        function sendNext() {
+            if (sent >= count) {
+                finishBatch();
+                return;
+            }
+            sent++;
+            const payload = prefix + '-' + sent;
+
+            fetch('/api/sse/publish', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({type: type, payload: payload})
+            })
+            .then(res => res.json())
+            .then(() => { success++; updateStats(); })
+            .catch(() => { failed++; updateStats(); });
+
+            updateStats();
+            batchTimer = setTimeout(sendNext, interval);
+        }
+
+        sendNext();
+    }
+
+    function stopBatch() {
+        finishBatch();
+    }
+
+    function finishBatch() {
+        if (batchTimer) { clearTimeout(batchTimer); batchTimer = null; }
+        document.getElementById('batch-start-btn').style.display = 'inline-block';
+        document.getElementById('batch-stop-btn').style.display = 'none';
+    }
+
+    /* ========== History ========== */
+    function loadHistory() {
+        const el = document.getElementById('history-content');
+        el.innerHTML = '<p style="color:#999;">Loading...</p>';
+
+        fetch('/api/sse/history')
+        .then(res => {
+            if (!res.ok) throw new Error('Not implemented yet');
+            return res.json();
+        })
+        .then(data => {
+            if (!data || data.length === 0) {
+                el.innerHTML = '<p style="color:#999;">No events found.</p>';
+                return;
+            }
+            let html = '<table style="width:100%; border-collapse:collapse; font-size:0.85rem;">';
+            html += '<tr style="background:#f0f2f5; text-align:left;"><th style="padding:8px;">ID</th><th style="padding:8px;">Type</th><th style="padding:8px;">Payload</th><th style="padding:8px;">Created</th></tr>';
+            data.forEach(e => {
+                html += '<tr style="border-bottom:1px solid #eee;"><td style="padding:8px;">' + e.id + '</td><td style="padding:8px;">' + e.type + '</td><td style="padding:8px;">' + e.payload + '</td><td style="padding:8px;">' + (e.createdAt || '-') + '</td></tr>';
+            });
+            html += '</table>';
+            el.innerHTML = html;
+        })
+        .catch(err => {
+            el.innerHTML = '<p style="color:#ea4335;">Error: ' + err.message + '</p>';
+        });
+    }
+
+    /* ========== Log (shared) ========== */
+    function appendLog(category, type, data) {
+        const logs = [document.getElementById('event-log'), document.getElementById('event-log-batch')];
+        const time = new Date().toLocaleTimeString('ko-KR');
+        let html = '';
+
+        if (category === 'system') {
+            html = '<div class="log-entry"><span class="log-time">' + time + '</span> <span class="log-system">[SYSTEM] ' + type + '</span></div>';
+        } else {
+            eventCount++;
+            document.getElementById('event-count').textContent = eventCount;
+            document.getElementById('event-count-batch').textContent = eventCount;
+            const payload = typeof data === 'object' ? JSON.stringify(data, null, 0) : data;
+            html = '<div class="log-entry"><span class="log-time">' + time + '</span> <span class="log-type">[' + type.toUpperCase() + ']</span> <span class="log-payload">' + payload + '</span></div>';
+        }
+
+        logs.forEach(log => {
+            if (log) { log.innerHTML += html; log.scrollTop = log.scrollHeight; }
+        });
+    }
+
+    function clearLog() {
+        ['event-log', 'event-log-batch'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = '';
+        });
+        eventCount = 0;
+        document.getElementById('event-count').textContent = '0';
+        document.getElementById('event-count-batch').textContent = '0';
+    }
+</script>
+</body>
+</html>

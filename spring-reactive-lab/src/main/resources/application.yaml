@@ -29,5 +29,8 @@ management:
 
 logging:
   level:
-    reactor.netty: DEBUG
+    reactor.netty: INFO
     io.github.springreactivelab: DEBUG
+#  structured:
+#    format:
+#      console: logstash
