@@ -19,7 +19,7 @@ public class Account {
 
     public boolean withdraw(Money money, AccountId targetAccountId) {
         if(!mayWithdraw(money)) {
-            retrun false;
+            return false;
         }
 
         Activity withdrawal = new Activity(
@@ -32,6 +32,12 @@ public class Account {
 
         this.activityWindow.addActivity(withdrawal);
         return true;
+    }
+
+    public Money calculateBalance() {
+        return activityWindow.getActivities().stream()
+                .map(a -> a.getTargetAccountId().equals(this.id) ? a.getMoney() : a.getMoney().negate())
+                .reduce(baselineBalance, Money::add);
     }
 
     private boolean mayWithdraw(Money money) {

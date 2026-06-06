@@ -17,7 +17,9 @@ public class AccountController {
         @PathVariable("amount") Long amount
     ) {
         SendMoneyCommand command = new SendMoneyCommand(
-          sourceAccountId, targetAccountId, amount
+                new org.hyeonqz.architecturelab.clean.example2.domain.AccountId(sourceAccountId),
+                new org.hyeonqz.architecturelab.clean.example2.domain.AccountId(targetAccountId),
+                org.hyeonqz.architecturelab.clean.example2.domain.Money.of(amount)
         );
 
         sendMoneyUseCase.sendMoney(command);
