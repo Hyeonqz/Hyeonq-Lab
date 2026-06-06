@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -22,7 +23,7 @@ public class NotificationEventHandler {
      * @Transactional: @Async 로 새 스레드에서 실행되므로 독립된 트랜잭션 필요
      */
     @Async("domainEventExecutor")
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePaymentCompleted(DomainEventPaymentCompletedEvent event) {
         log.info("[B안][NotificationHandler][{}] 결제 커밋 후 알림 처리 orderId={}", Thread.currentThread().getName(), event.getOrderId());
