@@ -1,8 +1,0 @@
-### Actuator - Health Check
-GET http://localhost:15867/actuator/health
-
-### Actuator - Metrics
-GET http://localhost:15867/actuator/metrics
-
-### Actuator - Environment
-GET http://localhost:15867/actuator/env
