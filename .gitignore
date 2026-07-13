@@ -53,3 +53,4 @@ bin/
 ### Claude Code (local AI records) ###
 CLAUDE.md
 .claude/CLAUDE.md
+.claude/
