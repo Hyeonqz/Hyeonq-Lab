@@ -1,1 +1,0 @@
-package io.github.hyeonqz.archlab.hexagonal_arch;
