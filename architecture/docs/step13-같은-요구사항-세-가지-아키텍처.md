@@ -34,6 +34,29 @@ architecture/src/main/java/org/hyeonqz/architecture/
     └── adapter/InMemoryOrderRepository.java, ConsoleLedger.java
 ```
 
+두 구현의 화살표를 그림으로 먼저 보자. 박스의 목록은 사실상 같은데 종착지가 다르다 — 왼쪽은 DB로, 오른쪽은 도메인으로.
+
+```mermaid
+flowchart TB
+    subgraph L[레이어드 — 화살표가 DB로]
+        direction TB
+        LC[Controller] --> LS[Service]
+        LS --> LR[Repository]
+        LR --> LDB[(Database)]
+    end
+    subgraph H[헥사고날 — 화살표가 도메인으로]
+        direction TB
+        HR[REST 어댑터] -->|호출| HU((유스케이스<br/>+ 도메인))
+        HT[테스트] -->|호출| HU
+        HJ[저장 어댑터] -.구현.-> HU
+        HL[원장 어댑터] -.구현.-> HU
+    end
+    style LDB fill:#ffd6d6,stroke:#c0392b
+    style HU fill:#d5f5e3,stroke:#27ae60
+```
+
+(더 많은 그림 — 어니언/클린 동심원, 아웃박스 시퀀스, 진자→나선 — 은 부록 E에 모아뒀다.)
+
 ## 2. 레이어드 구현 — 익숙한 그 모습
 
 `layered`의 화살표: `controller → service → repository → entity`. 전부 아래로, Step 06의 그림 그대로다. 규칙은 어디 사는가:
