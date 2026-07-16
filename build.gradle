@@ -1,19 +1,47 @@
 plugins {
-    id 'java'
+    id 'org.springframework.boot' version '4.0.0' apply false
 }
 
-group = 'org.hyeonqz'
-version = '1.0.0'
-
-repositories {
-    mavenCentral()
+allprojects {
+    group = 'org.hyeonqz'
+    version = '1.0.0'
+    repositories {
+        mavenCentral()
+    }
 }
 
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+// 모든 모듈 공통: JDK 21 + JUnit 5
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 }
 
-test {
-    useJUnitPlatform()
+// Spring Boot(JPA + MySQL) 를 적용할 모듈 목록.
+// 순수 java/kotlin 모듈이 추가되면 여기서 제외해 Spring 의존을 받지 않게 한다.
+def springModules = [':architecture', ':springboot-lab']
+
+configure(springModules.collect { project(it) }) {
+    dependencies {
+        // Spring Boot BOM 으로 버전 일괄 관리 (dependency-management 플러그인 없이 Gradle 네이티브 platform 사용)
+        implementation platform('org.springframework.boot:spring-boot-dependencies:4.0.0')
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'com.mysql:mysql-connector-j'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+}
+
+// 실행 가능한 Spring Boot 앱(bootRun/bootJar) 은 springboot-lab 에만.
+// architecture 는 여러 아키텍처 스타일이 공존하는 예제 라이브러리라 단일 부트 앱으로 만들지 않는다.
+configure(project(':springboot-lab')) {
+    apply plugin: 'org.springframework.boot'
 }

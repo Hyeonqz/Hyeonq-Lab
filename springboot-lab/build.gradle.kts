@@ -1,20 +1,2 @@
-plugins {
-    id("java")
-}
-
-group = "org.hyeonqz"
-version = "1.0.0"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
+// java 플러그인·JDK 21·JUnit·Spring Boot(JPA+MySQL)·bootRun/bootJar 는 모두 루트 build.gradle 에서 적용된다.
+// 이 모듈은 실행 가능한 Spring Boot 앱이다 (SpringbootLabApplication).
