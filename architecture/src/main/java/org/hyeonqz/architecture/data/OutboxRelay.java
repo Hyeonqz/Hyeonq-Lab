@@ -17,7 +17,12 @@ public class OutboxRelay {
         this.broker = broker;
     }
 
-    /** 한 번의 릴레이 실행. 발행에 성공한 이벤트만 아웃박스에서 제거한다. */
+    /**
+     * 한 번의 릴레이 실행. 발행에 성공한 이벤트만 아웃박스에서 제거한다.
+     * ponytail: 단일 릴레이를 가정한다. 릴레이 인스턴스가 여럿이면 같은 행을 동시에 집어
+     * 이중 발행할 수 있다(또 하나의 at-least-once 원천) — 실제라면 아웃박스 행에 리스/락이 필요하다.
+     * 어느 쪽이든 수신자의 멱등성이 최종 안전망이다.
+     */
     public void flush() {
         List<OutboxEvent> pending = store.pollPending();
         for (OutboxEvent event : pending) {

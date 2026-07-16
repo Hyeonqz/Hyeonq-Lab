@@ -18,7 +18,8 @@ import java.util.Set;
 public class SettlementLedger {
 
     private final List<LedgerEntry> entries = new ArrayList<>(); // 추가 전용
-    private final Set<String> processedEventIds = new HashSet<>(); // 멱등성 키
+    // 멱등성 키. ponytail: 메모리 집합이라 무한히 자란다 — 실제라면 처리 이력 테이블 + TTL로 경계를 둔다.
+    private final Set<String> processedEventIds = new HashSet<>();
 
     /** 브로커가 전달한 이벤트를 처리한다. 중복 전달은 여기서 걸러진다. */
     public void on(OutboxEvent event) {

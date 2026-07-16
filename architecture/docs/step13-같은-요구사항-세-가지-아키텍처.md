@@ -158,6 +158,50 @@ void 정산_완료된_주문은_취소할_수_없다() {
 - 헥사고날: 규칙은 `Order`(와 새 값 객체들)에 쌓인다. 단일 장소가 있으므로 복제 유인이 구조적으로 낮고, 각 규칙은 4절의 밀리초 테스트로 즉시 검증된다.
 - 판정: **이것이 갈림길의 실체다.** Fowler의 복잡도 곡선(Step 07)의 교차점은 DB 교체 같은 극적 사건이 아니라, 규칙이 하나씩 늘어나는 이 지루한 축적에서 온다.
 
+이 판정은 이 책의 중심 주장이므로, 산문으로 끝내지 않고 코드로 증명한다. `growth` 패키지에 시나리오 C를 그대로 구현했다 — 규칙 2("5만 원 초과 취소는 승인 필요")를 나중에 추가하고, 두 진입점(대화형 취소 + 배치 취소)이 그 규칙을 어떻게 다르게 겪는지를 테스트로 박제했다.
+
+**레이어드 — 규칙이 서비스에 살아 드리프트한다.** 배치 서비스는 나중에, 다른 스프린트에 추가되며 취소 검증을 `OrderService`에서 복사해 갔다. 복사한 시점에는 규칙 1("정산 완료 취소 금지")만 있었고, 이후 추가된 규칙 2는 이 경로에 반영되지 않았다.
+
+```java
+// growth/layered/OrderBatchService.java — 복사된 검증이 드리프트한다
+public void cancelStale(List<String> orderIds) {
+    for (String orderId : orderIds) {
+        Order order = store.get(orderId);
+        if ("SETTLED".equals(order.getStatus())) continue; // 복사해온 규칙 1
+        // 규칙 2(고액 승인)가 여기 없다 — 복제가 드리프트했다
+        order.setStatus("CANCELLED");
+    }
+}
+```
+
+`LayeredDriftTest`가 그 결과를 잡는다: 대화형 경로는 6만 원 주문의 무승인 취소를 `ApprovalRequiredException`으로 막는데, **배치 경로는 같은 주문을 승인 없이 취소한다.** 같은 고액 주문이 진입점에 따라 다르게 처리되는 것 — 이것이 "diff가 폭발하는" 장면이다.
+
+**헥사고날 — 규칙이 도메인에 살아 드리프트할 수 없다.** 취소하려면 반드시 `Order.cancel()`을 거쳐야 하므로, 배치를 짠 사람은 복사할 것이 없다(규칙이 도메인에 있다). 규칙 2가 `Order.cancel()`에 더해지면 두 경로가 자동으로 그것을 강제받는다.
+
+```java
+// growth/hexagonal/BatchCancelUseCase.java — 배치도 결국 order.cancel()을 부른다
+Order order = repository.byId(orderId);
+try {
+    order.cancel(false);              // 규칙은 도메인이 지킨다 — 우회 불가
+    repository.save(order);
+} catch (ApprovalRequiredException | IllegalStateException e) {
+    needsReview.add(orderId);          // 막힌 주문은 검토 목록으로
+}
+```
+
+`HexagonalSinglePlaceTest`는 배치 경로도 6만 원 주문에 막혀 취소하지 못하고 검토 목록으로 떨어뜨림을 확인한다. 레이어드에서 드리프트했던 바로 그 버그가 **구조적으로 발생 불가능**하다.
+
+정직한 각주: 규율 있는 레이어드 팀이라면 배치를 `OrderService.cancel()`로 라우팅하거나 공용 검증기를 추출해 이 드리프트를 피할 수 있다. 요점은 "레이어드는 반드시 드리프트한다"가 아니라, **헥사고날에서는 단일 장소(도메인 객체)가 이미 가장 저항 적은 경로여서 규율이 필요 없다**는 것이다 — Step 06에서 "복제는 필연"이 아니라 "구조적으로 유인된다"로 적은 이유가 이것이다.
+
+```
+architecture/src/main/java/org/hyeonqz/architecture/growth/
+├── layered/     OrderService(규칙 2개) + OrderBatchService(복사·드리프트)
+└── hexagonal/   Order.cancel(규칙 2개) + CancelOrderUseCase + BatchCancelUseCase(공유)
+architecture/src/test/java/org/hyeonqz/architecture/growth/
+├── LayeredDriftTest       — 두 경로가 드리프트해 고액 주문이 무승인 취소됨(버그 시연)
+└── HexagonalSinglePlaceTest — 두 경로가 같은 규칙에 막힘(버그 불가능)
+```
+
 ## 6. 클린은 어디 있는가 — 어휘 매핑
 
 우리의 헥사고날 구현에 클린 아키텍처의 어휘를 겹쳐보면:
